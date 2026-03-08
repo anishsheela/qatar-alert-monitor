@@ -29,6 +29,7 @@ def get_alerts():
     for item in data["alerts"]:
         for title in item["titles"]:
             alerts.append({
+                "id": title["id"],
                 "title": title["alertTitles"],
                 "content": clean_html(title["description"])
             })
@@ -37,7 +38,6 @@ def get_alerts():
 
 
 def send_telegram(message):
-
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
     requests.post(url, json={
@@ -60,16 +60,13 @@ def save_seen(data):
 
 
 def main():
-
     alerts = get_alerts()
     seen = load_seen()
 
     for alert in alerts:
+        alert_id = alert["id"]
 
-        key = alert["title"]
-
-        if key not in seen:
-
+        if alert_id not in seen:
             message = f"""
 🚨 Qatar Airways Travel Alert
 
@@ -79,8 +76,7 @@ def main():
 """
 
             send_telegram(message)
-
-            seen.append(key)
+            seen.append(alert_id)
 
     save_seen(seen)
 
